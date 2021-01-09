@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-from . import helpers
+import json
+from stock import *
 
-def get_hmm():
-    return 'hmmm...'
+stockList = []  
 
-
-def hmm():
-    print(get_hmm())
+with open('sample/202101072325_NCAV.json') as f:
+    d = json.load(f)
+    for item in d['list']:
+    	stock = Stock(item);
+    	print(stock.getClose())
+    	stockList.append(stock) 

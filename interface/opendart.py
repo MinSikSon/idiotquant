@@ -91,6 +91,3 @@ class OpenDart:
             return None
 
         return res_dictionary["list"]
-    
-if __name__ == "__main__":
-    pass

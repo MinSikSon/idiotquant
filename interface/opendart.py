@@ -8,7 +8,7 @@ from interface.crtfc_key import CRTFC_KEY
 
 from xml.etree.ElementTree import parse
 
-class Util:
+class CorpCode:
     tree = parse("interface/CORPCODE.xml")
     root = tree.getroot()
     corp_list = root.findall("list")
@@ -40,16 +40,16 @@ class OpenDart:
     SUCCESS = 200
 
     def __init__(self):
-        self.util = Util()
+        self.corpCode = CorpCode()
 
     # [NOTE] not used
     # https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019002
     def getCompanyInformation(self, corpName):
-        corpCode = self.util.getCorpCodeByCorpName(corpName)
+        corpCode = self.corpCode.getCorpCodeByCorpName(corpName)
         if corpCode == None:
             return None
             
-        URI = self.API_HOST + "company.json" + "?crtfc_key=" + CRTFC_KEY + "&corpCode=" + corpCode
+        URI = self.API_HOST + "company.json" + "?crtfc_key=" + CRTFC_KEY + "&corp_code=" + corpCode
         res = requests.get(URI)
     
         if res.status_code != 200:
@@ -67,7 +67,7 @@ class OpenDart:
         if ((businessQuarter == 1) or (businessQuarter == 2) or (businessQuarter == 3) or (businessQuarter == 4)) == False:
             return None
 
-        corpCode = self.util.getCorpCodeByCorpName(corpName)
+        corpCode = self.corpCode.getCorpCodeByCorpName(corpName)
         if corpCode == None:
             return None
         

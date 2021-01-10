@@ -58,22 +58,25 @@ class Stock:
 	def getPER(self):
 		return self.json['PER']
 
+	def getPBR(self):
+		return self.json['PBR']
+
 	def getFundamentalSalesCost(self):
 		# TODO 매출원가
 		return None
 
 	def setScore(self, key, value):
-		# TODO set score
-		return None
+		self.score = value
 
 	def getScore(self, key):
-		# TODO get score
-		return None
+		return self.score
+
+	def setRank(self, rank):
+		self.rank = rank
 
 	# Order is optional
-	def getRank(universe, key, order):
-		# TODO order by score
-		return None
-
+	def getRank(self, universe, key, order):
+		return self.rank
+		# return None
 
 

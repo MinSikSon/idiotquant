@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
+'''
+	Stock class
+	
+	주식 종목을 나타내는 객체입니다. 
+ 
+'''
 class Stock:
-	#code
+	# code
 	# name
 	# isETF
 	# market
@@ -48,6 +54,9 @@ class Stock:
 
 	def getFundamentalRevenue(self):
 		return self.json['매출액']
+
+	def getPER(self):
+		return self.json['PER']
 
 	def getFundamentalSalesCost(self):
 		# TODO 매출원가

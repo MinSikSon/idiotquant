@@ -1,5 +1,8 @@
 # idiotquant
-잘해보자
+
+## About Idiotquant
+
+blah blah.. 
 
 ## How to run
 
@@ -26,5 +29,5 @@ method
     python3 idiotquant/core.py
 ```
 
-## reference
+## Reference
 - https://github.com/navdeep-G/samplemod

@@ -39,14 +39,16 @@ class CustomFunction:
 	def stockPortfolioBuilder(self, stockList):
 
 		sortedList = []
-
+		#PER 정렬
 		perSorted = sorted(stockList, key=lambda x: float(x.getPER()), reverse=False)
+		#PBR 정렬
 		pbrSorted = sorted(stockList, key=lambda x: float(x.getPBR()), reverse=False)
 
 		sortedList.append(perSorted) 
 		sortedList.append(pbrSorted) 
 
-		self.calculateRank(sortedList, stockList)
+		#calculate rank and score
+		self.calculateScoreAndRank(sortedList, stockList)
 
 		# return None
 		return sorted(stockList, key=lambda x: int(x.getScore(None)), reverse=False)
@@ -71,9 +73,10 @@ class CustomFunction:
 		# 주가수익비율을 계산한 결과를 getPER(stock) 함수를 호출한 곳으로 넘겨줍니다.
 		return fundamentalProfit / stock.getFundamentalTotalAsset()
 
-	def calculateRank(self, universe, stockList):
+	def calculateScoreAndRank(self, universe, stockList):
 		rankDic = {}
 		
+		# calculate score
 		for universeItem in universe:
 			for idx, universeItemItem in enumerate(universeItem):
 				if universeItemItem in rankDic.keys():
@@ -81,17 +84,16 @@ class CustomFunction:
 				else:
 					rankDic[universeItemItem] = idx
 
+		# calculate rank(how to order by value in dictionary)			
 		rankDic = dict(sorted(rankDic.items(), key=lambda item: item[1]))
 
+		# inject score and rank in stock
 		rank = 0
 		for key in rankDic:
-			print(key.name, '->', rankDic[key])
+			# print(key.name, '->', rankDic[key])
 			key.setScore(None, rankDic[key])
 			rank += 1
 			key.setRank(rank)
-
-		# for stock in stockList:
-		# 	stock.setScore(None, rankDic[stock])
 
 		# rank dic key to list
 		# return [*rank]

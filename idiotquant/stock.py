@@ -74,6 +74,7 @@ class Stock:
 	def setRank(self, rank):
 		self.rank = rank
 
+	# TODO we need to implement order
 	# Order is optional
 	def getRank(self, universe, key, order):
 		return self.rank

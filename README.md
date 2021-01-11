@@ -14,7 +14,7 @@ variable
     stockNum
 ```
 
-2. implement the method in custome_function class.py
+2. implement the method in customeFunction class in custome_function.py file
  
 method
 ```

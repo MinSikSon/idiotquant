@@ -38,7 +38,7 @@ class Stock:
 
 	def getTradingValue(self):
 		# TODO 거래대금
-		return None
+		pass
 
 	def getFundamentalTotalAsset(self):
 		return self.json['자산총계']
@@ -63,7 +63,7 @@ class Stock:
 
 	def getFundamentalSalesCost(self):
 		# TODO 매출원가
-		return None
+		pass
 
 	def setScore(self, key, value):
 		self.score = value
@@ -77,6 +77,5 @@ class Stock:
 	# Order is optional
 	def getRank(self, universe, key, order):
 		return self.rank
-		# return None
 
 

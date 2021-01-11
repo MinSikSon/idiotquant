@@ -9,6 +9,10 @@ from interface.corpcode import CorpCode
 
 import json
 
+import os
+
+import pickle # key-value 유형의 데이터는 흔히 Dictionary 자료형 저장하는데 유용.
+
 
 class OpenDart:
     statusCode = {
@@ -62,11 +66,27 @@ class OpenDart:
         corpCode = self.corpCode.getCorpCodeByCorpName(corpName)
         if corpCode == None:
             return None
+
+        # NOTE: 백업 데이터 존재 여부 확인.
+        path= os.path.dirname(os.path.abspath(__file__))
+        dir = path + '/data'
+        if not os.path.isdir(dir):
+            os.makedirs(dir)
+        # print(path)
+        filePath = dir + '/financialInfo_%s_%sQ.bin' % (businessYear, businessQuarter)
+        # print(filePath)
+        if os.path.isfile(filePath):
+            # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
+            with open(filePath, 'rb') as f:
+                financialInfo = pickle.load(f)
+                if corpName in financialInfo.keys():
+                    return financialInfo
         
+
         reportCode = self.QUARTER[int(businessQuarter)]
 
-        # [NOTE] 단일회사 주요계정, 다중회사 주요계정?
-        URI = self.API_HOST  + "fnlttSinglAcnt.json" + "?crtfc_key=" + str(CRTFC_KEY) + "&corp_code=" + corpCode + "&bsns_year=" + str(businessYear) + "&reprt_code=" + str(reportCode)
+        # NOTE: 단일회사 주요계정, 다중회사 주요계정?
+        URI = self.API_HOST  + "fnlttSinglAcnt.json" + "?crtfc_key=" + str(CRTFC_KEY) + "&corp_code=" + str(corpCode) + "&bsns_year=" + str(businessYear) + "&reprt_code=" + str(reportCode)
         res = requests.get(URI)
 
         if res.status_code != self.SUCCESS:
@@ -81,12 +101,23 @@ class OpenDart:
             print("[warn]", resRawDictionary["status"], self.statusCode[resRawDictionary["status"]])
             return None
 
-
         resDictionary = self.dataCleansing(resRawDictionary["list"])
 
         tmpDict = dict()
         tmpDict[corpName] = resDictionary
 
+        # NOTE: 데이터 백업.
+        financialInfoDictionary = None
+        if os.path.isfile(filePath):
+            with open(filePath, 'rb') as f:
+                financialInfoDictionary = pickle.load(f)
+            financialInfoDictionary[corpName] = resDictionary
+            with open(filePath, 'wb') as f:
+                pickle.dump(financialInfoDictionary, f)
+            return financialInfoDictionary
+
+        with open(filePath, 'wb') as f:
+            pickle.dump(tmpDict, f)
         return tmpDict
 
     def dataCleansing(self, rawDictionary):

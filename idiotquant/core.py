@@ -13,13 +13,13 @@ with open('sample/202101072325_NCAV.json') as f:
 		stock = Stock(item)
 		stockList.append(stock) 
 
-	io = IdiotQuant(stockList, CustomFunction())
-	io.initialize()
-	io.stockFilter()	
-	io.stockPortfolioBuilder()
+	iq = IdiotQuant(stockList, CustomFunction())
+	iq.initialize()
+	iq.stockFilter()	
+	iq.stockPortfolioBuilder()
 
 	print("-----------------------------------")
-	for stock in io.stockList:
+	for stock in iq.stockList:
 		print("stock name : " + stock.name)
 		print("stock score : " + str(stock.getScore(None)))
 		print("stock rank : " + str(stock.getRank(None, None, None)))
@@ -28,6 +28,11 @@ with open('sample/202101072325_NCAV.json') as f:
 		# print("stock pbr : " + stock.getPBR())
 		# print("stock pbr*per : " + str(float(stock.getPBR()) * float(stock.getPER())))
 		
-	print(len(io.stockList))
+	print(len(iq.stockList))
+
+	with open('result/result.json', 'w') as fp:
+		# pickle.dump(len(data), fp)
+	    for stock in iq.stockList:
+	        json.dump(stock.__dict__, fp, ensure_ascii=False, indent=4)
 
 

@@ -12,5 +12,4 @@ class Basket:
 		self.budget = budget
 
 	def setPortfolioBuilder(self, func):
-
-		return None
+		pass

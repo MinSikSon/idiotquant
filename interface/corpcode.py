@@ -3,11 +3,14 @@ from xml.etree.ElementTree import parse
 class CorpCode:
     tree = parse("interface/CORPCODE.xml")
     root = tree.getroot()
-    corp_list = root.findall("list")
+    corpList = root.findall("list")
+
+    def getAllCorpCode(self):
+        return self.corpList
 
     def getCorpCodeByCorpName(self, corpName):
-        for i in range(0, len(self.corp_list)):
-            if self.corp_list[i].findtext("corp_name") == corpName:
-                return self.corp_list[i].findtext("corp_code")
+        for i in range(0, len(self.corpList)):
+            if self.corpList[i].findtext("corp_name") == corpName:
+                return self.corpList[i].findtext("corp_code")
 
         return None

@@ -15,7 +15,7 @@ import pickle # key-value 유형의 데이터는 흔히 Dictionary 자료형 저
 
 
 class OpenDart:
-    statusCode = {
+    __statusCode = {
         '000': '정상',
         '010': '등록되지 않은 키입니다.',
         '013': '*** 어떤 error 인지 확인 필요합니다. *** 아마도 해당 businessQuarter 의 재무제표가 없는 것 같습니다.',
@@ -25,7 +25,7 @@ class OpenDart:
         '800': '원활한 공시서비스를 위하여 오픈API 서비스가 중지 중입니다.',
         '900': '정의되지 않은 오류가 발생하였습니다.',
     }
-    QUARTER = [
+    __QUARTER = [
         None,
         "11013",  # 1분기보고서
         "11012",  # 반기보고서
@@ -33,63 +33,42 @@ class OpenDart:
         "11011",  # 사업보고서
     ]
     API_HOST = "https://opendart.fss.or.kr/api/"
-    SUCCESS = 200
+    __SUCCESS = 200
+
+    __dirFinancialInfo = os.path.dirname(os.path.abspath(__file__)) + '/data/financialinfo'
 
     def __init__(self):
         self.corpCode = CorpCode()
 
-    # [NOTE] not used
-    # https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019002
-    def getCompanyInformation(self, corpName):
-        corpCode = self.corpCode.getCorpCodeByCorpName(corpName)
-        if corpCode == None:
-            return None
-            
-        URI = self.API_HOST + "company.json" + "?crtfc_key=" + CRTFC_KEY + "&corp_code=" + corpCode
-        res = requests.get(URI)
-    
-        if res.status_code != 200:
-            print("[warn] corpCode 가 잘못되었습니다", corpCode)
-            return None
-
-        return res
-
     # https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS003&apiId=2019016
-    def getFinancialInformation(self, corpName, businessYear=None, businessQuarter=None):
-        if businessYear == None:
-            return None
-        if businessQuarter == None:
-            return None
-        if ((businessQuarter == 1) or (businessQuarter == 2) or (businessQuarter == 3) or (businessQuarter == 4)) == False:
+    def getFinancialInformation(self, corpName, businessYear, businessQuarter):
+        if self.__checkParameterType(businessYear, businessQuarter) == False:
             return None
 
+        if isinstance(corpName, str) == False:
+            return None
         corpCode = self.corpCode.getCorpCodeByCorpName(corpName)
         if corpCode == None:
             return None
 
         # NOTE: 백업 데이터 존재 여부 확인.
-        path= os.path.dirname(os.path.abspath(__file__))
-        dir = path + '/data'
-        if not os.path.isdir(dir):
-            os.makedirs(dir)
-        # print(path)
-        filePath = dir + '/financialInfo_%s_%sQ.bin' % (businessYear, businessQuarter)
-        # print(filePath)
+        if not os.path.isdir(self.__dirFinancialInfo):
+            os.makedirs(self.__dirFinancialInfo)
+        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
                 financialInfo = pickle.load(f)
                 if corpName in financialInfo.keys():
-                    return financialInfo
-        
+                    return financialInfo[corpName]
 
-        reportCode = self.QUARTER[int(businessQuarter)]
+        reportCode = self.__QUARTER[int(businessQuarter)]
 
         # NOTE: 단일회사 주요계정, 다중회사 주요계정?
         URI = self.API_HOST  + "fnlttSinglAcnt.json" + "?crtfc_key=" + str(CRTFC_KEY) + "&corp_code=" + str(corpCode) + "&bsns_year=" + str(businessYear) + "&reprt_code=" + str(reportCode)
         res = requests.get(URI)
 
-        if res.status_code != self.SUCCESS:
+        if res.status_code != self.__SUCCESS:
             print("[warn] corpCode 가 잘못되었습니다", corpCode, res.status_code)
             return None
 
@@ -98,10 +77,10 @@ class OpenDart:
 
         # print(resRawDictionary)
         if resRawDictionary["status"] != "000":
-            print("[warn]", resRawDictionary["status"], self.statusCode[resRawDictionary["status"]])
+            print("[warn]", resRawDictionary["status"], self.__statusCode[resRawDictionary["status"]])
             return None
 
-        resDictionary = self.dataCleansing(resRawDictionary["list"])
+        resDictionary = self.__dataCleansing(resRawDictionary["list"])
 
         tmpDict = dict()
         tmpDict[corpName] = resDictionary
@@ -114,24 +93,107 @@ class OpenDart:
             financialInfoDictionary[corpName] = resDictionary
             with open(filePath, 'wb') as f:
                 pickle.dump(financialInfoDictionary, f)
-            return financialInfoDictionary
+            return financialInfoDictionary[corpName]
 
         with open(filePath, 'wb') as f:
             pickle.dump(tmpDict, f)
-        return tmpDict
+        return tmpDict[corpName]
 
-    def dataCleansing(self, rawDictionary):
+    def getFinancialInformationAll(self, businessYear, businessQuarter):
+        if self.__checkParameterType(businessYear, businessQuarter) == False:
+            return None
+
+        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        if self.__checkFinishMark(businessYear, businessQuarter):
+            if os.path.isfile(filePath) == False:
+                print("fatal error")
+                return None
+            with open(filePath, 'rb') as f:
+                financialInfoDictionary = pickle.load(f)
+                return financialInfoDictionary
+
+        corpList = self.corpCode.getAllCorpCode()
+        for i in range(0, len(corpList)):
+            corpName = corpList[i].findtext("corp_name")
+            # corpCode = corpList[i].findtext("corp_code")
+            stockCode = corpList[i].findtext("stock_code")
+            if stockCode == '' or stockCode == ' ':
+                continue
+            self.getFinancialInformation(corpName, businessYear, businessQuarter)
+
+
+        self.__setExtractFinishMark(businessYear, businessQuarter)
+
+        with open(filePath, 'rb') as f:
+            financialInfoDictionary = pickle.load(f)
+            return financialInfoDictionary
+
+        print("fatal error")
+        return None
+
+    def __setExtractFinishMark(self, businessYear, businessQuarter):
+        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+
+        financialInfoDictionary = None
+        if os.path.isfile(filePath):
+            with open(filePath, 'rb') as f:
+                financialInfoDictionary = pickle.load(f)
+            financialInfoDictionary["finish"] = True
+            with open(filePath, 'wb') as f:
+                pickle.dump(financialInfoDictionary, f)
+
+    def __clearExtractFinishMark(self, businessYear, businessQuarter):
+        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+
+        if os.path.isfile(filePath):
+            with open(filePath, 'rb') as f:
+                financialInfoDictionary = pickle.load(f)
+            financialInfoDictionary["finish"] = False
+            with open(filePath, 'wb') as f:
+                pickle.dump(financialInfoDictionary, f)
+
+    def __getFinancialInfoBinaryFileName(self, businessYear, businessQuarter):
+        return 'financialInfo_%s_%sQ.bin' % (businessYear, businessQuarter)
+
+    def __checkFinishMark(self, businessYear=None, businessQuarter=None):
+        # NOTE: 백업 데이터 존재 여부 확인.
+        if not os.path.isdir(self.__dirFinancialInfo):
+            return False
+        # print(path)
+        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        # print(filePath)
+        if os.path.isfile(filePath) == False:
+            return False
+
+        # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
+        with open(filePath, 'rb') as f:
+            financialInfo = pickle.load(f)
+            if "finish" in financialInfo.keys():
+                return True
+
+        return False
+
+    def __checkParameterType(self, businessYear, businessQuarter):
+        if type(businessYear) is not int:
+            return False
+        if type(businessQuarter) is not int:
+            return False
+        if ((businessQuarter == 1) or (businessQuarter == 2) or (businessQuarter == 3) or (businessQuarter == 4)) == False:
+            return False
+        return True
+
+    def __dataCleansing(self, rawDictionary):
         resDictionary = dict()
-        resDictionary["rcept_no"] = str(rawDictionary[0]["rcept_no"])
+        resDictionary["rcept_no"]   = str(rawDictionary[0]["rcept_no"])
         resDictionary["reprt_code"] = str(rawDictionary[0]["reprt_code"])
-        resDictionary["corp_code"] = str(rawDictionary[0]["corp_code"])
+        resDictionary["corp_code"]  = str(rawDictionary[0]["corp_code"])
         resDictionary["stock_code"] = str(rawDictionary[0]["stock_code"])
-        resDictionary["fs_div"] = str(rawDictionary[0]["fs_div"])
-        resDictionary["fs_nm"] = str(rawDictionary[0]["fs_nm"])
-        resDictionary["sj_div"] = str(rawDictionary[0]["sj_div"])
-        resDictionary["thstrm_nm"] = str(rawDictionary[0]["thstrm_nm"])
-        resDictionary["thstrm_dt"] = str(rawDictionary[0]["thstrm_dt"])
-        resDictionary["sj_div"] = str(rawDictionary[0]["sj_div"])
+        resDictionary["fs_div"]     = str(rawDictionary[0]["fs_div"])
+        resDictionary["fs_nm"]      = str(rawDictionary[0]["fs_nm"])
+        resDictionary["sj_div"]     = str(rawDictionary[0]["sj_div"])
+        resDictionary["thstrm_nm"]  = str(rawDictionary[0]["thstrm_nm"])
+        resDictionary["thstrm_dt"]  = str(rawDictionary[0]["thstrm_dt"])
+        resDictionary["sj_div"]     = str(rawDictionary[0]["sj_div"])
 
         # [NOTE] frmtrm_dt, frmtrm_amount 은 저장하지 않았습니다.
         for i in range(len(rawDictionary)):

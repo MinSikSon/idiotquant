@@ -42,8 +42,8 @@ class Krx:
 
         rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
         
-        # rawOhlcvList.empty (rawOhlcvList 데이터는 pandas.DataFrame 입니다.)
-        # True if DataFrame is entirely empty (no items), meaning any of the axes are of length 0. (https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.empty.html)
+        # NOTE: rawOhlcvList 데이터는 pandas.DataFrame 인데, DaraFrame 전체가 empty 면 rawOhlcvList.empty 는 True 를 리턴 함.
+        # reref] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.empty.html
         if rawOhlcvList.empty == True:
             return None
 
@@ -60,9 +60,7 @@ class Krx:
         with open(filePath, 'wb') as f:
             pickle.dump(resOhlcv, f)
 
-        # return json.dumps(resOhlcv, ensure_ascii=False, indent="\t") # dict to json
         return resOhlcv
-
 
     def getMarketFundamentalByTicker(self, date=None, market="ALL"):
         """티커로 Fundamental(DIV, BPS, PER, EPS, PBR)

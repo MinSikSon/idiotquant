@@ -25,4 +25,9 @@ with open('sample/202101072325_NCAV.json') as f:
 		print("stock per : " + stock.getPER())
 	print(len(iq.stockList))
 
+	with open('result/result.json', 'w') as fp:
+		# pickle.dump(len(data), fp)
+	    for stock in iq.stockList:
+	        json.dump(stock.__dict__, fp, ensure_ascii=False, indent=4)
+
 

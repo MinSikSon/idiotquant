@@ -47,8 +47,7 @@ class Krx:
         try:
             rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
         except:
-            print(rawOhlcvList)
-            print("[시도횟수 초과] stock.get_market_ohlcv_by_ticker")
+            print("[KRX API update 가 필요합니다] stock.get_market_ohlcv_by_ticker")
             exit()
 
         # NOTE: rawOhlcvList 데이터는 pandas.DataFrame 인데, DaraFrame 전체가 empty 면 rawOhlcvList.empty 는 True 를 리턴 함.
@@ -96,21 +95,21 @@ class Krx:
         try:
             rawFundamentalList = stock.get_market_fundamental_by_ticker(date, market) # pandas form
         except:
-            print("[시도횟수 초과] stock.get_market_fundamental_by_ticker")
+            print("[KRX API update 가 필요합니다] stock.get_market_fundamental_by_ticker")
             exit()
 
         if rawFundamentalList.empty == True:
             print("[WARN] please check parameter `date`")
             return None
 
-        resFundamental = {}
+        resFundamental = dict()
         corpName = rawFundamentalList.columns[0]
         for i in rawFundamentalList.index:
             tmpDict = dict()
             for j in range(1, len(rawFundamentalList.columns)):
-                tmpDict[rawFundamentalList.columns[j]] = str(rawFundamentalList.loc[i][rawFundamentalList.columns[j]])
+                tmpDict[rawFundamentalList.columns[j]] = str(rawFundamentalList.loc[i][rawFundamentalList.columns[j]]).replace(" ", "")
 
-            resFundamental[rawFundamentalList.loc[i][corpName]]= tmpDict
+            resFundamental[str(rawFundamentalList.loc[i][corpName]).replace(" ", "")] = tmpDict
 
         # NOTE: 데이터 백업.
         with open(filePath, 'wb') as f:
@@ -135,29 +134,29 @@ class Krx:
                 marketValue = pickle.load(f)
                 return marketValue
 
-        marketOhlcv = self.getMarketOhlcvByTicker(date)
+        marketOhlcv = self.getMarketOhlcvByTicker(date, market)
         if marketOhlcv is None:
             return None
-        marketFundamental = self.getMarketFundamentalByTicker(date)
+        marketFundamental = self.getMarketFundamentalByTicker(date, market)
         if marketFundamental is None:
             return None
 
         corpCode = CorpCode()
         corpList = corpCode.getAllCorpCode()
 
-        resData = {"date": date, "market": market, "ohlcv": True, "fundamental": True}
+        resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True}}
+
         mergedDict = dict()
         for i in range(0, len(corpList)):
             corpName = corpList[i].findtext("corp_name")
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]
-            except KeyError:
-                continue
-            try:
                 mergedDict[corpName].update(marketFundamental[corpName])
             except KeyError:
                 continue
         resData["data"] = mergedDict
+
+        resData["finish"] = True
 
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.dirMarket):
@@ -167,4 +166,4 @@ class Krx:
         with open(filePath, 'wb') as f:
             pickle.dump(resData, f)
 
-        return mergedDict
+        return resData

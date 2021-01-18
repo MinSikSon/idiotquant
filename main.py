@@ -19,7 +19,7 @@ def sample_1():
 
     mergeDic = dict()
     corpList = CorpCode().getAllCorpCode()
-           
+
     for i in range(0, len(corpList)):
         corpName = corpList[i].findtext("corp_name")
         # corpCode = corpList[i].findtext("corp_code")
@@ -56,7 +56,8 @@ def sample_3():
 
     corpName = "삼성전자"
     # date = "20201101"
-    date = "20200831"
+    date = "20201223"
+    print(corpName, date)
 
     stKrx = Krx()
     resOhlcv = stKrx.getMarketOhlcvByTicker(date)

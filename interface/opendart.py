@@ -18,7 +18,7 @@ class OpenDart:
     __statusCode = {
         '000': '정상',
         '010': '등록되지 않은 키입니다.',
-        '013': '*** 어떤 error 인지 확인 필요합니다. *** 아마도 해당 businessQuarter 의 재무제표가 없는 것 같습니다.',
+        '013': '*** 어떤 error 인지 확인 필요합니다. *** 아마도 해당 종목은 이 businessQuarter 의 재무제표가 없는 것 같습니다.',
         '011': '사용할 수 없는 키입니다. 오픈API에 등록되었으나, 일시적으로 사용 중지된 키를 통하여 검색하는 경우 발생합니다.',
         '020': '요청 제한을 초과하였습니다. 일반적으로는 10,000건 이상의 요청에 대하여 이 에러 메시지가 발생되나, 요청 제한이 다르게 설정된 경우에는 이에 준하여 발생됩니다.',
         '100': '필드의 부적절한 값입니다. 필드 설명에 없는 값을 사용한 경우에 발생하는 메시지입니다.',
@@ -77,7 +77,7 @@ class OpenDart:
 
         # print(resRawDictionary)
         if resRawDictionary["status"] != "000":
-            print("[warn]", resRawDictionary["status"], self.__statusCode[resRawDictionary["status"]])
+            print("[warn] 종목명:",corpName, ", status:", resRawDictionary["status"], self.__statusCode[resRawDictionary["status"]])
             return None
 
         resDictionary = self.__dataCleansing(resRawDictionary["list"])
@@ -112,6 +112,8 @@ class OpenDart:
                 financialInfoDictionary = pickle.load(f)
                 return financialInfoDictionary
 
+        self.__clearExtractFinishMark(businessYear, businessQuarter)
+
         corpList = self.corpCode.getAllCorpCode()
         for i in range(0, len(corpList)):
             corpName = corpList[i].findtext("corp_name")
@@ -120,7 +122,6 @@ class OpenDart:
             if stockCode == '' or stockCode == ' ':
                 continue
             self.getFinancialInformation(corpName, businessYear, businessQuarter)
-
 
         self.__setExtractFinishMark(businessYear, businessQuarter)
 
@@ -201,3 +202,29 @@ class OpenDart:
 
         # return json.dumps(resDictionary, ensure_ascii=False, indent="\t") # dict to json
         return resDictionary
+
+    def getEmptyStockFinancialInfo(self):
+        return {
+            "rcept_no": None,
+            "reprt_code": None,
+            "corp_code": None,
+            "stock_code": None,
+            "fs_div": None,
+            "fs_nm": None,
+            "sj_div": None,
+            "thstrm_nm": None,
+            "thstrm_dt": None,
+            "유동자산": None,
+            "비유동자산": None,
+            "자산총계": None,
+            "유동부채": None,
+            "비유동부채": None,
+            "부채총계": None,
+            "자본금": None,
+            "이익잉여금": None,
+            "자본총계": None,
+            "매출액": None,
+            "영업이익": None,
+            "법인세차감전 순이익": None,
+            "당기순이익": None,
+        }

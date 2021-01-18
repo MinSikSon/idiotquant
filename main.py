@@ -43,7 +43,7 @@ def sample_2():
 
     corpName = "삼성전자"
     businessYear = 2020
-    businessQuarter = 1
+    businessQuarter = 3
 
     stOpenDart = OpenDart()
     financialInfo = stOpenDart.getFinancialInformation(corpName, businessYear, businessQuarter)
@@ -89,6 +89,45 @@ def sample_5():
     extractPath = "./market_all_" + date + ".json"
     Common.extractJson(stKrx.getMarketValue(date), extractPath)
 
+    businessYear = 2020
+    businessQuarter = 3
+    stOpenDart = OpenDart()
+    financialInfoAll = stOpenDart.getFinancialInformationAll(businessYear, businessQuarter)
+    extractPath = "./financialInfoAll_" + str(businessYear) + "_" + str(businessQuarter) + ".json"
+    Common.extractJson(financialInfoAll, extractPath)
+
+def sample_6():
+    date = "20210118"
+    businessYear = 2020
+    businessQuarter = 3
+
+    stKrx = Krx()
+    marketValueDic = stKrx.getMarketValue(date)
+
+    stOpenDart = OpenDart()
+    financialInfoAll = stOpenDart.getFinancialInformationAll(businessYear, businessQuarter)
+    emptyStockFinancialInfo = stOpenDart.getEmptyStockFinancialInfo()
+
+    corpList = CorpCode().getAllCorpCode()
+    for i in range(0, len(corpList)):
+        corpName = corpList[i].findtext("corp_name")
+        # corpCode = corpList[i].findtext("corp_code")
+        # stockCode = corpList[i].findtext("stock_code")
+        try:
+            marketValueDic["data"][corpName].update(financialInfoAll[corpName])
+        except KeyError:
+            try:
+                marketValueDic["data"][corpName].update(emptyStockFinancialInfo)
+                # print("corpName: ", corpName, "update emptyStockFinancialInfo")
+            except KeyError:
+                # marketValueDic["data"][corpName] = emptyStockFinancialInfo
+                # print("corpName: ", corpName, "set emptyStockFinancialInfo")
+                continue
+
+    extractPath = "./all_" + str(businessYear) + "_" + str(businessQuarter) + "_" + str(date) + ".json"
+
+    Common.extractJson(marketValueDic, extractPath)
+
 if __name__ == "__main__" :
     # sample_1() # NOTE: opendart 및 krx 에서 얻어온 데이터를 하나로 합치는 예.
 
@@ -98,4 +137,6 @@ if __name__ == "__main__" :
 
     # sample_4() # NOTE: Krx 에서 얻을 수 있는 모든 data 를 추출
 
-    sample_5() # NOTE: Krx 에서 데이터 얻어서 json file 로 저장
+    # sample_5() # NOTE: Krx 에서 데이터 얻어서 json file 로 저장
+
+    sample_6() # 특정한 날의 주가 등의 데이터를 하나로 합치는 예

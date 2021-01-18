@@ -12,9 +12,12 @@ import json
 import os
 import pickle
 
+from interface.corpcode import CorpCode
+
 class Krx:
     dirMarketFundamental = os.path.dirname(os.path.abspath(__file__)) + '/data/marketfundamental'
     dirMarketOhlcv = os.path.dirname(os.path.abspath(__file__)) + '/data/marketohlcv'
+    dirMarket = os.path.dirname(os.path.abspath(__file__)) + '/data/market'
 
     def __init__(self):
         pass
@@ -40,8 +43,14 @@ class Krx:
                 marketOhlcv = pickle.load(f)
                 return marketOhlcv
 
-        rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
-        
+        rawOhlcvList = None
+        try:
+            rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
+        except:
+            print(rawOhlcvList)
+            print("[시도횟수 초과] stock.get_market_ohlcv_by_ticker")
+            exit()
+
         # NOTE: rawOhlcvList 데이터는 pandas.DataFrame 인데, DaraFrame 전체가 empty 면 rawOhlcvList.empty 는 True 를 리턴 함.
         # reref] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.empty.html
         if rawOhlcvList.empty == True:
@@ -83,7 +92,13 @@ class Krx:
                 marketFundamental = pickle.load(f)
                 return marketFundamental
 
-        rawFundamentalList = stock.get_market_fundamental_by_ticker(date, market) # pandas form
+        rawFundamentalList = None
+        try:
+            rawFundamentalList = stock.get_market_fundamental_by_ticker(date, market) # pandas form
+        except:
+            print("[시도횟수 초과] stock.get_market_fundamental_by_ticker")
+            exit()
+
         if rawFundamentalList.empty == True:
             print("[WARN] please check parameter `date`")
             return None
@@ -103,3 +118,53 @@ class Krx:
 
         # return json.dumps(resFundamental, ensure_ascii=False, indent="\t") # dict to json
         return resFundamental
+
+    def getMarketValue(self, date=None, market="ALL"):
+        if date is None:
+            return None
+
+        # NOTE: 백업 데이터 존재 여부 확인.
+        if not os.path.isdir(self.dirMarket):
+            os.makedirs(self.dirMarket)
+        # print(path)
+        filePath = self.dirMarket + '/' + 'market_%s_%s.bin' % (market, date)
+        # print(filePath)
+        if os.path.isfile(filePath):
+            # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
+            with open(filePath, 'rb') as f:
+                marketValue = pickle.load(f)
+                return marketValue
+
+        marketOhlcv = self.getMarketOhlcvByTicker(date)
+        if marketOhlcv is None:
+            return None
+        marketFundamental = self.getMarketFundamentalByTicker(date)
+        if marketFundamental is None:
+            return None
+
+        corpCode = CorpCode()
+        corpList = corpCode.getAllCorpCode()
+
+        resData = {"date": date, "market": market, "ohlcv": True, "fundamental": True}
+        mergedDict = dict()
+        for i in range(0, len(corpList)):
+            corpName = corpList[i].findtext("corp_name")
+            try:
+                mergedDict[corpName] = marketOhlcv[corpName]
+            except KeyError:
+                continue
+            try:
+                mergedDict[corpName].update(marketFundamental[corpName])
+            except KeyError:
+                continue
+        resData["data"] = mergedDict
+
+        # NOTE: 백업 데이터 존재 여부 확인.
+        if not os.path.isdir(self.dirMarket):
+            os.makedirs(self.dirMarket)
+
+        filePath = self.dirMarket + '/' + 'market_%s_%s.bin' % (market, date)
+        with open(filePath, 'wb') as f:
+            pickle.dump(resData, f)
+
+        return mergedDict

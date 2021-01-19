@@ -47,7 +47,8 @@ class Krx:
         try:
             rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
         except:
-            print("[KRX API update 가 필요합니다] stock.get_market_ohlcv_by_ticker")
+            print("[param] date 를 확인해주세요.")
+            print("[위 사항이 아니라면] [KRX API update 가 필요합니다] stock.get_market_ohlcv_by_ticker")
             exit()
 
         # NOTE: rawOhlcvList 데이터는 pandas.DataFrame 인데, DaraFrame 전체가 empty 면 rawOhlcvList.empty 는 True 를 리턴 함.
@@ -117,6 +118,9 @@ class Krx:
 
         # return json.dumps(resFundamental, ensure_ascii=False, indent="\t") # dict to json
         return resFundamental
+
+    def getMarketCapByTicker(self):
+        pass
 
     def getMarketValue(self, date=None, market="ALL"):
         if date is None:

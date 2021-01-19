@@ -33,12 +33,18 @@ def sample_6():
     financialInformationAll = OpenDart().getFinancialInformationAll(2020, 3)
     Common.extractJson(financialInformationAll, './test.json')
 
+def sample_7():
+    marketCap = Krx().getMarketCapByTicker("20210119")
+    print(marketCap["삼성전자"])
+    print(marketCap["SK하이닉스"])
+
 if __name__ == "__main__" :
     # sample_1()
     # sample_2()
     # sample_3()
     # sample_4()
-    sample_5()
-    sample_6()
+    # sample_5()
+    # sample_6()
+    sample_7()
 
 

@@ -1,7 +1,7 @@
 from interface.opendart import OpenDart
 from interface.krx import Krx
 from interface.corpcode import CorpCode
-from interface.common as Common
+import interface.common as Common
 
 def sample_1():
     ohlcv = Krx().getMarketOhlcvByTicker("20210119")

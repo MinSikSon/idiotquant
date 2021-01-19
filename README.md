@@ -131,7 +131,19 @@ print(marketValue["data"]["HDC현대산업개발"])
 ```
 
 #### 2.1.4 (TBD) getMarketCapByTicker
-(구현 예정 입니다)
+특정 일자의 종목별 종가/시가총액/거래량/거래대금/상장주식수를 ***dictionary 타입***으로 얻어 옵니다.
+
+```python
+# main.py - sample_7
+import interface.krx import Krx
+marketCap = Krx().getMarketCapByTicker("20210119")
+print(marketCap["삼성전자"])
+print(marketCap["SK하이닉스"])
+```
+```text
+{'종목명': '삼성전자', '종가': '87000', '시가총액': '519371081850000', '거래량': '39895044', '거래대금': '519371081850000', '상장주식수': '5969782550'}
+{'종목명': 'SK하이닉스', '종가': '130500', '시가총액': '95004308632500', '거래량': '4513315', '거래대금': '95004308632500', '상장주식수': '728002365'}
+```
 
 ### 2.2 opendart
 #### 2.2.1 getFinancialInformation

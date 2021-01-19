@@ -18,16 +18,11 @@ class Krx:
     dirMarketFundamental = os.path.dirname(os.path.abspath(__file__)) + '/data/marketfundamental'
     dirMarketOhlcv = os.path.dirname(os.path.abspath(__file__)) + '/data/marketohlcv'
     dirMarket = os.path.dirname(os.path.abspath(__file__)) + '/data/market'
-
+    dirMarketCap = os.path.dirname(os.path.abspath(__file__)) + '/data/marketcap'
     def __init__(self):
         pass
 
     def getMarketOhlcvByTicker(self, date=None, market="ALL"):
-        """티커로 ohlcv 조회 (ohlcv: open, high, low, close, volume)
-        :param date: 조회 일자 (YYYYMMDD)
-        :param market: 조회 시장 (KOSPI/KOSDAQ/KONEX/ALL)
-        :return: market 내의 모든 종목의 ohlcv
-        """
         if date == None:
             return None
 
@@ -72,11 +67,6 @@ class Krx:
         return resOhlcv
 
     def getMarketFundamentalByTicker(self, date=None, market="ALL"):
-        """티커로 Fundamental(DIV, BPS, PER, EPS, PBR)
-        :param date: 조회 일자 (YYYYMMDD)
-        :param market: 조회 시장 (KOSPI/KOSDAQ/KONEX/ALL)
-        :return: market 내의 모든 종목의 Fundamental
-        """
         if date == None:
             return None
 
@@ -119,8 +109,43 @@ class Krx:
         # return json.dumps(resFundamental, ensure_ascii=False, indent="\t") # dict to json
         return resFundamental
 
-    def getMarketCapByTicker(self):
-        pass
+    def getMarketCapByTicker(self, date=None, market="ALL"):
+        if date is None:
+            return None
+        if not os.path.isdir(self.dirMarketCap):
+            os.makedirs(self.dirMarketCap)
+        filePath = self.dirMarketCap + '/' + 'marketCap_%s_%s.bin' % (market, date)
+        if os.path.isfile(filePath):
+            with open(filePath, 'rb') as f:
+                marketCap = pickle.load(f)
+                return marketCap
+
+        rawMarketCap = None
+        try:
+            rawMarketCap = stock.get_market_cap_by_ticker(date, market) # pandas form
+        except:
+            print("[KRX API update 가 필요합니다] stock.get_market_cap_by_ticker")
+            exit()
+
+        if rawMarketCap.empty == True:
+            print("[WARN] please check parameter `date`")
+            return None
+
+        resMarketCap = dict()
+        for ticker in rawMarketCap.index:
+            tmpDict = dict()
+            종목명 = stock.get_market_ticker_name(ticker)
+            tmpDict["종목명"] = 종목명
+            for column in rawMarketCap.columns: # 종가, 시가총액, 거래량, 시가총액, 상장주식수
+                tmpDict[column] = str(rawMarketCap.loc[ticker][column]).replace(" ", "")
+
+            resMarketCap[종목명] = tmpDict
+
+        # NOTE: 데이터 백업.
+        with open(filePath, 'wb') as f:
+            pickle.dump(resMarketCap, f)
+
+        return resMarketCap
 
     def getMarketValue(self, date=None, market="ALL"):
         if date is None:

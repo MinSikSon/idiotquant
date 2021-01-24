@@ -58,6 +58,7 @@ def extractLatestStockInfoToLatestJsonFile():
         except KeyError:
             continue
 
+    # NOTE: ./data 폴더가 있어야 latest.json 파일이 생성됩니다.
     Common.extractJson(marketValue, "./data/latest.json")
 
 if __name__ == "__main__" :

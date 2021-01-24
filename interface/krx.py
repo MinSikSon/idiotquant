@@ -181,6 +181,7 @@ class Krx:
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]
                 mergedDict[corpName].update(marketFundamental[corpName])
+                mergedDict[corpName]["종목명"] = corpName
             except KeyError:
                 continue
         resData["data"] = mergedDict

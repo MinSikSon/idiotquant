@@ -174,6 +174,7 @@ class Krx:
         if marketCap is None:
             return None
 
+
         corpCode = CorpCode()
         corpList = corpCode.getAllCorpCode()
 

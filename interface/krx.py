@@ -170,8 +170,8 @@ class Krx:
         if marketFundamental is None:
             return None
 
-        marketCapByTicker = self.getMarketCapByTicker(date, market)
-        if marketCapByTicker is None:
+        marketCap = self.getMarketCapByTicker(date, market)
+        if marketCap is None:
             return None
 
         corpCode = CorpCode()

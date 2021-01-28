@@ -170,6 +170,10 @@ class Krx:
         if marketFundamental is None:
             return None
 
+        marketCap = self.getMarketCapByTicker(date, market)
+        if marketCap is None:
+            return None
+
         corpCode = CorpCode()
         corpList = corpCode.getAllCorpCode()
 
@@ -181,6 +185,7 @@ class Krx:
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]
                 mergedDict[corpName].update(marketFundamental[corpName])
+                mergedDict[corpName].update(marketCap[corpName])
                 mergedDict[corpName]["종목명"] = corpName
             except KeyError:
                 continue

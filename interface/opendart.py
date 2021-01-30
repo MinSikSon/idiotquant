@@ -82,10 +82,11 @@ class OpenDart:
 
         resDictionary = self.__dataCleansing(resRawDictionary["list"])
 
+        resDictionary["종목명"] = corpName
         tmpDict = dict()
         tmpDict[corpName] = resDictionary
 
-        # NOTE: 데이터 백업.
+        # NOTE: [데이터 백업] 파일 있을 경우. 
         financialInfoDictionary = None
         if os.path.isfile(filePath):
             with open(filePath, 'rb') as f:
@@ -95,6 +96,7 @@ class OpenDart:
                 pickle.dump(financialInfoDictionary, f)
             return financialInfoDictionary[corpName]
 
+        # NOTE: [데이터 백업] 파일 없을 경우.
         with open(filePath, 'wb') as f:
             pickle.dump(tmpDict, f)
         return tmpDict[corpName]

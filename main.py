@@ -38,13 +38,30 @@ def sample_7():
     print(marketCap["삼성전자"])
     print(marketCap["SK하이닉스"])
 
+def extractLatestStockInfoToLatestJsonFile():
+    '''
+    TODO: latest date 가져오는 기능은 다른 feature 에서 구현 예정.
+    현재는 수동으로 businessYear, businessQuarter, date 를 입력해야 합니다.
+    '''
+    businessYear = 2020
+    businessQuarter = 3
+    date = "20210122"
+
+    marketValue = Krx().getMarketValue(date)
+    financialInfoAll = OpenDart().getFinancialInformationAll(businessYear, businessQuarter)
+
+
+    for corp in CorpCode().corpList:
+        corpName = corp.findtext("corp_name")
+        try:
+            marketValue["data"][corpName].update(financialInfoAll[corpName])
+        except KeyError:
+            continue
+
+    # NOTE: ./data 폴더가 있어야 latest.json 파일이 생성됩니다.
+    Common.extractJson(marketValue, "./data/latest.json")
+
 if __name__ == "__main__" :
-    # sample_1()
-    # sample_2()
-    # sample_3()
-    # sample_4()
-    # sample_5()
-    # sample_6()
-    sample_7()
+    extractLatestStockInfoToLatestJsonFile()
 
 

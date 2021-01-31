@@ -6,6 +6,7 @@
  
 '''
 class Stock:
+	INVALID_VALUE = 0xFFFFFFFF
 	# code
 	# name
 	# isETF
@@ -20,6 +21,7 @@ class Stock:
 		self.json = json
 		# TODO 종목 코드가 필요함
 		# self.code = json['종목코드']
+		# print('json: ', json['종목명'])
 		self.name = json['종목명']
 		# TODO 기준가 = 전일종가
 		self.bestPrice = json['종가']
@@ -56,7 +58,10 @@ class Stock:
 		return self.json['매출액']
 
 	def getPER(self):
-		return self.json['PER']
+		try:
+			return self.json['PER']
+		except KeyError:
+			return str(self.INVALID_VALUE)
 
 	def getPBR(self):
 		return self.json['PBR']

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from basket import Basket
+from idiotquant.basket import Basket
 '''
 	IdiotQuant class
 	

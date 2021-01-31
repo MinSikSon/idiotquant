@@ -3,6 +3,8 @@ from interface.krx import Krx
 from interface.corpcode import CorpCode
 import interface.common as Common
 
+import idiotquant.core as Core
+
 def sample_1():
     ohlcv = Krx().getMarketOhlcvByTicker("20210119")
     print(ohlcv["삼성전자"])
@@ -45,7 +47,7 @@ def extractLatestStockInfoToLatestJsonFile():
     '''
     businessYear = 2020
     businessQuarter = 3
-    date = "20210122"
+    date = "20210129"
 
     marketValue = Krx().getMarketValue(date)
     financialInfoAll = OpenDart().getFinancialInformationAll(businessYear, businessQuarter)
@@ -63,5 +65,5 @@ def extractLatestStockInfoToLatestJsonFile():
 
 if __name__ == "__main__" :
     extractLatestStockInfoToLatestJsonFile()
-
+    Core.main()
 

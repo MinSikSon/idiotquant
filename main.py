@@ -5,6 +5,8 @@ import interface.common as Common
 
 import idiotquant.core as Core
 
+import argparse
+
 def sample_1():
     ohlcv = Krx().getMarketOhlcvByTicker("20210119")
     print(ohlcv["삼성전자"])
@@ -64,6 +66,13 @@ def extractLatestStockInfoToLatestJsonFile():
     Common.extractJson(marketValue, "./data/latest.json")
 
 if __name__ == "__main__" :
+    parser = argparse.ArgumentParser(description="전략별 종목 추천기능", usage="python3 main.py -h")
+    parser.add_argument('--select-strategy', '-s', type=int, help='1: NCAV 전략, 2:sample', required=True)
+
+    args = parser.parse_args()
+    # print(args.select_strategy)
+
+    # main logic
     extractLatestStockInfoToLatestJsonFile()
-    Core.main()
+    Core.main(strategy=args.select_strategy)
 

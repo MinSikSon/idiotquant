@@ -2,9 +2,9 @@
 import json
 from idiotquant.stock import Stock
 from idiotquant.idiot_quant import IdiotQuant
-from idiotquant.custom_function import CustomFunction, CustomFunction_2
+from idiotquant.custom_function import *
 
-def main():
+def main(strategy=1):
 	stockList = []
 
 	with open('data/latest.json') as f:
@@ -16,15 +16,24 @@ def main():
 			# print(item, d['data'][item])
 			stock = Stock(d['data'][item])
 			stockList.append(stock)
-
-		iq = IdiotQuant(stockList, CustomFunction_2())
+		if strategy == 1:
+			customFunction = CustomFunction__NCAV_strategy
+		elif strategy == 2:
+			customFunction = CustomFunction__sample
+		else:
+			customFunction = CustomFunction__NCAV_strategy
+		iq = IdiotQuant(stockList, customFunction())
 		iq.initialize()
 		iq.stockFilter()
 		iq.stockPortfolioBuilder()
 
 		print("-----------------------------------")
 		for stock in iq.stockList:
-			print(stock.name, ") 종가:", format(int(stock.getClose()), ','), "| PER:", stock.getPER(), "| 매출액:", format(int(stock.getFundamentalRevenue()), ','))
+			print(stock.name, ") 종가:", format(int(stock.getClose()), ','), 
+			"| PER:", stock.getPER(), 
+			"| 매출액:", format(int(stock.getFundamentalRevenue()), ','),
+			"| 당기순이익:", format(int(stock.getFundamentalNetProfit()), ',')
+			)
 		print(len(iq.stockList))
 
 		with open('result/result.json', 'w') as fp:

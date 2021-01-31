@@ -32,11 +32,17 @@ class Stock:
 
 
 	# def getClose(self, index):
+	def getStockName(self):
+		return self.json['종목명']
+
 	def getClose(self):
 		return self.json['종가']
 
 	def getMarketCapital(self):
-		return self.json['시가총액']
+		try:
+			return self.json['시가총액']
+		except KeyError:
+			return str(0)
 
 	def getTradingValue(self):
 		# TODO 거래대금
@@ -46,17 +52,31 @@ class Stock:
 		return self.json['자산총계']
 
 	def getFundamentalCurrentAsset(self):
-		return self.json['유동자산']
+		try:
+			if self.json['유동자산'] is '-':
+				return str(0)
+			else:
+				return self.json['유동자산']
+		except KeyError:
+			return str(0)
 
 	def getFundamentalTotalLiability(self):
-		return self.json['부채총계']
+		try:
+			return self.json['부채총계']
+		except KeyError:
+			return str(self.INVALID_VALUE)
 
 	def getFundamentalTotalEquity(self):
 		return self.json['자산총계']
 
 	def getFundamentalRevenue(self):
-		return self.json['매출액']
-
+		try:
+			if self.json['매출액'] is '-':
+				return str(0)
+			else:
+				return self.json['매출액']
+		except KeyError:
+			return str(0)
 	def getPER(self):
 		try:
 			return self.json['PER']

@@ -14,7 +14,7 @@ class IdiotQuant:
 		self.stockWeight = customFunction.stockWeight
 
 	def initialize(self):
-		self.stockBasket = Basket(None, self.stockNum, None);
+		self.stockBasket = Basket(None, self.stockNum, None)
 
 		# 주식 포트폴리오 구성 함수를 지정합니다.
 		# self.stockBasket.setPortfolioBuilder(stockPortfolioBuilder);

@@ -24,10 +24,7 @@ def main():
 
 		print("-----------------------------------")
 		for stock in iq.stockList:
-			print("stock name : " + stock.name)
-			# print("stock close : " + stock.getClose())
-			# print("stock per : " + stock.getPER())
-			print("stock 매출액 : ", stock.getFundamentalRevenue(), ", per: ", stock.getPER())
+			print(stock.name, ") 종가:", format(int(stock.getClose()), ','), "| PER:", stock.getPER(), "| 매출액:", format(int(stock.getFundamentalRevenue()), ','))
 		print(len(iq.stockList))
 
 		with open('result/result.json', 'w') as fp:

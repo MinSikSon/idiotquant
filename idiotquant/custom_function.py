@@ -31,11 +31,14 @@ class CustomFunction_2:
 	def stockFilter(self, stock):
 		if stock.getPER() == 'None' or stock.getPER() == '0.0':
 			return False
-		if float(stock.getPER()) > 10.0:
+		if float(stock.getPER()) > 15.0:
 			return False
 		# if int(stock.getFundamentalRevenue()) < int(100000000000):
 		# 	return False
 		if float(stock.getPER()) == 0xFFFFFFFF:
+			return False
+
+		if float(stock.getFundamentalNetProfit()) < 0:
 			return False
 
 		filter0 = float(stock.getFundamentalCurrentAsset()) - float(stock.getFundamentalTotalLiability()) > float(stock.getMarketCapital())

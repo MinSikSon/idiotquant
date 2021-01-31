@@ -30,11 +30,6 @@ class Stock:
 		# TODO KRX에서 제공하는 업종코드입니다.
 		# self.sector = json['업종코드']
 
-
-	# def getClose(self, index):
-	def getStockName(self):
-		return self.json['종목명']
-
 	def getClose(self):
 		return self.json['종가']
 
@@ -98,6 +93,12 @@ class Stock:
 
 	def setRank(self, rank):
 		self.rank = rank
+
+	def getFundamentalNetProfit(self):
+		try:
+			return self.json['당기순이익']
+		except KeyError:
+			return str(0)
 
 	# TODO we need to implement order
 	# Order is optional

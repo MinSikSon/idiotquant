@@ -42,14 +42,14 @@ def sample_7():
     print(marketCap["삼성전자"])
     print(marketCap["SK하이닉스"])
 
-def extractLatestStockInfoToLatestJsonFile():
+def extractLatestStockInfoToLatestJsonFile(businessYear, businessQuarter, date):
     '''
     TODO: latest date 가져오는 기능은 다른 feature 에서 구현 예정.
     현재는 수동으로 businessYear, businessQuarter, date 를 입력해야 합니다.
     '''
-    businessYear = 2020
-    businessQuarter = 3
-    date = "20210129"
+    # businessYear = 2020
+    # businessQuarter = 3
+    # date = "20210201"
 
     marketValue = Krx().getMarketValue(date)
     financialInfoAll = OpenDart().getFinancialInformationAll(businessYear, businessQuarter)
@@ -68,11 +68,16 @@ def extractLatestStockInfoToLatestJsonFile():
 if __name__ == "__main__" :
     parser = argparse.ArgumentParser(description="전략별 종목 추천기능", usage="python3 main.py -h")
     parser.add_argument('--select-strategy', '-s', type=int, help='1: NCAV 전략, 2:sample', required=True)
+    # TODO: 날짜 입력
+    parser.add_argument('--year', '-y', type=int, help='2021', required=True)
+    parser.add_argument('--quarter', '-q', type=int, help='1/2/3/4', required=True)
+    parser.add_argument('--date', '-d', type=str, help='20210202', required=True)
+
 
     args = parser.parse_args()
     # print(args.select_strategy)
 
     # main logic
-    extractLatestStockInfoToLatestJsonFile()
+    extractLatestStockInfoToLatestJsonFile(args.year, args.quarter, args.date)
     Core.main(strategy=args.select_strategy)
 

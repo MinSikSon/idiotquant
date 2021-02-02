@@ -73,11 +73,11 @@ def getBusinessDay():
         lastBusinessDay -= datetime.timedelta(days=1)
     elif datetime.date.weekday(lastBusinessDay) == 6: # 일요일
         lastBusinessDay -= datetime.timedelta(days=2)
-
-    # 다음날 되었는지 확인
-    nineHoursAgo = lastBusinessDay - datetime.timedelta(hours=9)
-    if lastBusinessDay.strftime("%d") != nineHoursAgo.strftime("%d"):
-        return nineHoursAgo.strftime("%Y%m%d")
+    else: # 다음날 되었는지 확인
+        nineHoursAgo = lastBusinessDay - datetime.timedelta(hours=9)
+        if lastBusinessDay.strftime("%d") != nineHoursAgo.strftime("%d"):
+            lastBusinessDay = nineHoursAgo
+    
     return lastBusinessDay.strftime("%Y%m%d")
 
 if __name__ == "__main__" :

@@ -181,7 +181,7 @@ class Krx:
         mergedDict = dict()
         for i in range(0, len(corpList)):
             corpName = corpList[i].findtext("corp_name")
-            print(corpName)
+            # print(corpName)
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]
                 mergedDict[corpName]["종목명"] = corpName

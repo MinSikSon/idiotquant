@@ -7,6 +7,8 @@ import idiotquant.core as Core
 
 import argparse
 
+import datetime
+
 def sample_1():
     ohlcv = Krx().getMarketOhlcvByTicker("20210119")
     print(ohlcv["삼성전자"])
@@ -65,19 +67,31 @@ def extractLatestStockInfoToLatestJsonFile(businessYear, businessQuarter, date):
     # NOTE: ./data 폴더가 있어야 latest.json 파일이 생성됩니다.
     Common.extractJson(marketValue, "./data/latest.json")
 
+def getBusinessDay():
+    lastBusinessDay = datetime.datetime.today()
+    if datetime.date.weekday(lastBusinessDay) == 5: # 토요일
+        lastBusinessDay -= datetime.timedelta(days=1)
+    elif datetime.date.weekday(lastBusinessDay) == 6: # 일요일
+        lastBusinessDay -= datetime.timedelta(days=2)
+
+    # 다음날 되었는지 확인
+    nineHoursAgo = lastBusinessDay - datetime.timedelta(hours=9)
+    if lastBusinessDay.strftime("%d") != nineHoursAgo.strftime("%d"):
+        return nineHoursAgo.strftime("%Y%m%d")
+    return lastBusinessDay.strftime("%Y%m%d")
+
 if __name__ == "__main__" :
     parser = argparse.ArgumentParser(description="전략별 종목 추천기능", usage="python3 main.py -h")
-    parser.add_argument('--select-strategy', '-s', type=int, help='1: NCAV 전략, 2:sample', required=True)
+    parser.add_argument('--select-strategy', '-s', type=int, help='0: sample_1, 1: NCAV 전략, 2: sample_2', required=True)
     # TODO: 날짜 입력
-    parser.add_argument('--year', '-y', type=int, help='2021', required=True)
-    parser.add_argument('--quarter', '-q', type=int, help='1/2/3/4', required=True)
-    parser.add_argument('--date', '-d', type=str, help='20210202', required=True)
-
+    parser.add_argument('-y', '--year', type=int, help='2021', required=True)
+    parser.add_argument('-q', '--quarter', type=int, help='1/2/3/4', required=True)
+    parser.add_argument('-d', '--date', default=getBusinessDay(), type=str, help='Date in format yyyymmdd')
+    # parser.add_argument('-d', '--date', type=str, help='Date in format yyyymmdd', required=True)
 
     args = parser.parse_args()
-    # print(args.select_strategy)
 
     # main logic
     extractLatestStockInfoToLatestJsonFile(args.year, args.quarter, args.date)
-    Core.main(strategy=args.select_strategy)
+    Core.main(strategyNumber=args.select_strategy)
 

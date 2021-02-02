@@ -56,8 +56,8 @@ class Stock:
 		except KeyError: return float(0)
 	def getFundamentalCurrentAsset(self):
 		try:
-			if self.json['유동자산'] == '-': return str(0)
-			else: return self.json['유동자산']
+			if self.json['유동자산'] == '-': return float(0)
+			else: return float(self.json['유동자산'])
 		except KeyError: return float(0)
 	def getFundamentalTotalLiability(self):
 		try: return float(self.json['부채총계'])
@@ -68,7 +68,7 @@ class Stock:
 	def getFundamentalRevenue(self):
 		try:
 			if self.json['매출액'] == '-': return float(0)
-			else: return self.json['매출액']
+			else: return float(self.json['매출액'])
 		except KeyError: return float(0)
 	def getPER(self):
 		try: return float(self.json['PER'])

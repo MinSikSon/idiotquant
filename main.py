@@ -81,14 +81,12 @@ def getBusinessDay():
     return lastBusinessDay.strftime("%Y%m%d")
 
 if __name__ == "__main__" :
+    # option
     parser = argparse.ArgumentParser(description="전략별 종목 추천기능", usage="python3 main.py -h")
     parser.add_argument('--select-strategy', '-s', type=int, help='0: sample_1, 1: NCAV 전략, 2: sample_2', required=True)
-    # TODO: 날짜 입력
     parser.add_argument('-y', '--year', type=int, help='2021', required=True)
     parser.add_argument('-q', '--quarter', type=int, help='1/2/3/4', required=True)
     parser.add_argument('-d', '--date', default=getBusinessDay(), type=str, help='Date in format yyyymmdd')
-    # parser.add_argument('-d', '--date', type=str, help='Date in format yyyymmdd', required=True)
-
     args = parser.parse_args()
 
     # main logic

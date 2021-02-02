@@ -5,6 +5,11 @@
 blah blah.. 
 
 ## How to run
+```
+(root 로 이동)
+python3 main.py -h
+python3 main.py -y 2020 -q 3 -s 0
+```
 
 ### Idiot Quant
 1. modify variable that you want

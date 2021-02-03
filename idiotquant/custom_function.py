@@ -57,7 +57,7 @@ class CustomFunction__sample2(AbstractCustomFunction):
 	stockNum = 30       # 주식 종목 수
 
 	def stockFilter(self, stock):
-		if stock.getPER() == 'None' or stock.getPER() == '0.0': return False
+		if stock.getPER() == None or stock.getPER() == 0: return False
 		# 거래량 90000 이상
 		if float(stock.getTradingVolume()) < 90000: return False
 		# 시가 대비 종가 10% 상승

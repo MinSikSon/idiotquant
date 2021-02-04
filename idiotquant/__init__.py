@@ -1,2 +1,2 @@
-import core
+import idiotquant.core
 

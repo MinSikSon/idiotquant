@@ -1,16 +1,38 @@
 from xml.etree.ElementTree import parse
 
+from pykrx import stock
+
 class CorpCode:
-    tree = parse("interface/CORPCODE.xml")
-    root = tree.getroot()
-    corpList = root.findall("list")
+    def __init__(self, useCorpCodeXml=True):
+        self.useCorpCodeXml = useCorpCodeXml
+        if useCorpCodeXml == True:
+            tree = parse("interface/CORPCODE.xml")
+            root = tree.getroot()
+            self.corpList = root.findall("list")
+        else:
+            self.tickerList = stock.get_market_ticker_list()
 
     def getAllCorpCode(self):
-        return self.corpList
+        if self.useCorpCodeXml == True:
+            return self.corpList
+        else:
+            return self.tickerList
 
     def getCorpCodeByCorpName(self, corpName):
-        for i in range(0, len(self.corpList)):
-            if self.corpList[i].findtext("corp_name") == corpName:
-                return self.corpList[i].findtext("corp_code")
+        if self.useCorpCodeXml == True:
+            for corpList in self.corpList:
+                if corpList.findtext("corp_name") == corpName:
+                    return corpList.findtext("corp_code")
+        else:
+            for ticker in self.tickerList:
+                name = stock.get_market_ticker_name(ticker)
+                if name == corpName:
+                    return ticker
 
         return None
+
+if __name__ == "__main__":
+    corpCode = CorpCode(useCorpCodeXml=False)
+    # print(corpCode.getAllCorpCode())
+    print(corpCode.getCorpCodeByCorpName("삼성전자"))
+    print(corpCode.getCorpCodeByCorpName("POSCO"))

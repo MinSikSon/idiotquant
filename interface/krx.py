@@ -179,9 +179,9 @@ class Krx:
         resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True}}
 
         mergedDict = dict()
-        for i in range(0, len(corpList)):
-            corpName = corpList[i].findtext("corp_name")
-            print(corpName)
+        for corp in corpList:
+            corpName = corp.findtext("corp_name")
+            # print(corpName)
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]
                 mergedDict[corpName]["종목명"] = corpName

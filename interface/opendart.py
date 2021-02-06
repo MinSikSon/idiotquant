@@ -117,10 +117,10 @@ class OpenDart:
         self.__clearExtractFinishMark(businessYear, businessQuarter)
 
         corpList = self.corpCode.getAllCorpCode()
-        for i in range(0, len(corpList)):
-            corpName = corpList[i].findtext("corp_name")
+        for corp in corpList:
+            corpName = corp.findtext("corp_name")
             # corpCode = corpList[i].findtext("corp_code")
-            stockCode = corpList[i].findtext("stock_code")
+            stockCode = corp.findtext("stock_code")
             if stockCode == '' or stockCode == ' ':
                 continue
             self.getFinancialInformation(corpName, businessYear, businessQuarter)

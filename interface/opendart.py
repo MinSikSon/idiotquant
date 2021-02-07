@@ -13,6 +13,7 @@ import os
 
 import pickle # key-value 유형의 데이터는 흔히 Dictionary 자료형 저장하는데 유용.
 
+from tqdm import tqdm
 
 class OpenDart:
     __statusCode = {
@@ -117,10 +118,12 @@ class OpenDart:
         self.__clearExtractFinishMark(businessYear, businessQuarter)
 
         corpList = self.corpCode.getAllCorpCode()
-        for i in range(0, len(corpList)):
-            corpName = corpList[i].findtext("corp_name")
+        # desc="getFinancialInformationAll"
+        desc="Collecting financial statments ..."
+        for corp in tqdm(corpList, desc):
+            corpName = corp.findtext("corp_name")
             # corpCode = corpList[i].findtext("corp_code")
-            stockCode = corpList[i].findtext("stock_code")
+            stockCode = corp.findtext("stock_code")
             if stockCode == '' or stockCode == ' ':
                 continue
             self.getFinancialInformation(corpName, businessYear, businessQuarter)
@@ -199,8 +202,8 @@ class OpenDart:
         resDictionary["sj_div"]     = str(rawDictionary[0]["sj_div"])
 
         # [NOTE] frmtrm_dt, frmtrm_amount 은 저장하지 않았습니다.
-        for i in range(len(rawDictionary)):
-            resDictionary[rawDictionary[i]["account_nm"]] = str(rawDictionary[i]["thstrm_amount"].replace(",", ""))
+        for rawDic in rawDictionary:
+            resDictionary[rawDic["account_nm"]] = str(rawDic["thstrm_amount"].replace(",", ""))
 
         # return json.dumps(resDictionary, ensure_ascii=False, indent="\t") # dict to json
         return resDictionary

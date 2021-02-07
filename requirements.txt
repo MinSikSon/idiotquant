@@ -3,3 +3,4 @@ sphinx
 requests
 pykrx
 pickle
+tqdm

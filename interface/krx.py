@@ -14,6 +14,8 @@ import pickle
 
 from interface.corpcode import CorpCode
 
+from tqdm import tqdm
+
 class Krx:
     dirMarketFundamental = os.path.dirname(os.path.abspath(__file__)) + '/data/marketfundamental'
     dirMarketOhlcv = os.path.dirname(os.path.abspath(__file__)) + '/data/marketohlcv'
@@ -179,8 +181,10 @@ class Krx:
         resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True}}
 
         mergedDict = dict()
-        for i in range(0, len(corpList)):
-            corpName = corpList[i].findtext("corp_name")
+        # desc="getMarketValue"
+        desc="Today's stock price information ..."
+        for corp in tqdm(corpList, desc):
+            corpName = corp.findtext("corp_name")
             # print(corpName)
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]

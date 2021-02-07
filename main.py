@@ -69,14 +69,21 @@ def extractLatestStockInfoToLatestJsonFile(businessYear, businessQuarter, date):
 
 def getBusinessDay():
     lastBusinessDay = datetime.datetime.today()
-    if datetime.date.weekday(lastBusinessDay) == 5: # 토요일
+    nineHoursAgo = lastBusinessDay - datetime.timedelta(hours=9)
+
+    if datetime.date.weekday(lastBusinessDay) == 5: # 오늘이 토요일 이라면, 금요일 기준으로 변경
         lastBusinessDay -= datetime.timedelta(days=1)
-    elif datetime.date.weekday(lastBusinessDay) == 6: # 일요일
+    elif datetime.date.weekday(lastBusinessDay) == 6: # 오늘이 일요일 이라면, 금요일 기준으로 변경
         lastBusinessDay -= datetime.timedelta(days=2)
-    else: # 다음날 되었는지 확인
-        nineHoursAgo = lastBusinessDay - datetime.timedelta(hours=9)
-        if lastBusinessDay.strftime("%d") != nineHoursAgo.strftime("%d"):
+    elif datetime.date.weekday(lastBusinessDay) == 0: # 오늘이 월요일 이지만 장 열리기 전이라면, 금요일 기준으로 변경
+        if datetime.date.weekday(nineHoursAgo) == 6:
+            lastBusinessDay -= datetime.timedelta(hours=57)
+        else:
+            pass # 오늘 기준
+    elif lastBusinessDay.strftime("%d") != nineHoursAgo.strftime("%d"): # 장 열리기 전이라면, 어제 기준으로 변경
             lastBusinessDay = nineHoursAgo
+    else:
+        pass # 오늘 기준
     
     return lastBusinessDay.strftime("%Y%m%d")
 

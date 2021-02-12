@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# sms
+interface/test
+interface/.DS_Store
+.DS_Store
+
+interface/data
+sample
+result
+
+data

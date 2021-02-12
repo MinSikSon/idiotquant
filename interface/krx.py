@@ -173,14 +173,17 @@ class Krx:
         if marketCap is None:
             return None
 
-        corpCode = CorpCode()
-        corpList = corpCode.getAllCorpCode()
-
         resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True}}
 
         mergedDict = dict()
+
+        corpCode = CorpCode()
+        corpList = corpCode.getAllCorpCode()
         for corp in corpList:
             corpName = corp.findtext("corp_name")
+        # tickerList = stock.get_market_ticker_list(date, market="ALL")
+        # for ticker in tickerList:
+        #     corpName = stock.get_market_ticker_name(ticker)
             # print(corpName)
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]

@@ -31,9 +31,7 @@ class Krx:
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.dirMarketOhlcv):
             os.makedirs(self.dirMarketOhlcv)
-        # print(path)
         filePath = self.dirMarketOhlcv + '/marketOhlcv_%s_%s.bin' % (market, date)
-        # print(filePath)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
@@ -75,9 +73,7 @@ class Krx:
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.dirMarketFundamental):
             os.makedirs(self.dirMarketFundamental)
-        # print(path)
         filePath = self.dirMarketFundamental + '/marketFundamental_%s_%s.bin' % (market, date)
-        # print(filePath)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
@@ -156,9 +152,7 @@ class Krx:
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.dirMarket):
             os.makedirs(self.dirMarket)
-        # print(path)
         filePath = self.dirMarket + '/' + 'market_%s_%s.bin' % (market, date)
-        # print(filePath)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
@@ -175,16 +169,18 @@ class Krx:
         if marketCap is None:
             return None
 
-        corpCode = CorpCode()
-        corpList = corpCode.getAllCorpCode()
-
         resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True}}
 
         mergedDict = dict()
-        # desc="getMarketValue"
+        
         desc="Today's stock price information ..."
+        corpCode = CorpCode()
+        corpList = corpCode.getAllCorpCode()
         for corp in tqdm(corpList, desc):
             corpName = corp.findtext("corp_name")
+        # tickerList = stock.get_market_ticker_list(date, market="ALL")
+        # for ticker in tqdm(tickerList, desc):
+        #     corpName = stock.get_market_ticker_name(ticker)
             # print(corpName)
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]

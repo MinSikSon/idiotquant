@@ -118,7 +118,6 @@ class OpenDart:
         self.__clearExtractFinishMark(businessYear, businessQuarter)
 
         corpList = self.corpCode.getAllCorpCode()
-        # desc="getFinancialInformationAll"
         desc="Collecting financial statments ..."
         for corp in tqdm(corpList, desc):
             corpName = corp.findtext("corp_name")

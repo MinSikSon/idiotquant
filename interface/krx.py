@@ -168,7 +168,7 @@ class Krx:
         if marketCap is None:
             return None
 
-        resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True}}
+        resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True, "marketCap": True}}
 
         mergedDict = dict()
         

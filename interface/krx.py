@@ -47,18 +47,18 @@ class Krx:
             exit()
 
         # NOTE: rawOhlcvList 데이터는 pandas.DataFrame 인데, DaraFrame 전체가 empty 면 rawOhlcvList.empty 는 True 를 리턴 함.
-        # reref] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.empty.html
+        # [refer] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.empty.html
         if rawOhlcvList.empty == True:
             return None
 
         resOhlcv = dict()
-        corpName = rawOhlcvList.columns[0]
-        for i in rawOhlcvList.index:
+        desc="get ohlcv"
+        for ticker in tqdm(rawOhlcvList.index, desc):
+            corpName = stock.get_market_ticker_name(ticker)
             tmpDict = dict()
-            for j in range(1, len(rawOhlcvList.columns)):
-                tmpDict[rawOhlcvList.columns[j]] = str(rawOhlcvList.loc[i][rawOhlcvList.columns[j]])
-
-            resOhlcv[rawOhlcvList.loc[i][corpName]]= tmpDict
+            for column in rawOhlcvList.columns:
+                tmpDict[column] = str(rawOhlcvList.loc[ticker][column])
+            resOhlcv[corpName]= tmpDict
 
         # NOTE: 데이터 백업.
         with open(filePath, 'wb') as f:
@@ -92,19 +92,18 @@ class Krx:
             return None
 
         resFundamental = dict()
-        corpName = rawFundamentalList.columns[0]
-        for i in rawFundamentalList.index:
+        desc="get fundamental"
+        for ticker in tqdm(rawFundamentalList.index, desc):
+            corpName = stock.get_market_ticker_name(ticker)
             tmpDict = dict()
-            for j in range(1, len(rawFundamentalList.columns)):
-                tmpDict[rawFundamentalList.columns[j]] = str(rawFundamentalList.loc[i][rawFundamentalList.columns[j]]).replace(" ", "")
-
-            resFundamental[str(rawFundamentalList.loc[i][corpName]).replace(" ", "")] = tmpDict
+            for column in rawFundamentalList.columns:
+                tmpDict[column] = str(rawFundamentalList.loc[ticker][column]).replace(" ", "")
+            resFundamental[corpName] = tmpDict
 
         # NOTE: 데이터 백업.
         with open(filePath, 'wb') as f:
             pickle.dump(resFundamental, f)
 
-        # return json.dumps(resFundamental, ensure_ascii=False, indent="\t") # dict to json
         return resFundamental
 
     def getMarketCapByTicker(self, date=None, market="ALL"):
@@ -130,14 +129,14 @@ class Krx:
             return None
 
         resMarketCap = dict()
-        for ticker in rawMarketCap.index:
+        desc="get marketCap"
+        for ticker in tqdm(rawMarketCap.index, desc):
             tmpDict = dict()
-            종목명 = stock.get_market_ticker_name(ticker)
-            tmpDict["종목명"] = 종목명
+            corpName = stock.get_market_ticker_name(ticker)
+            tmpDict["종목명"] = corpName
             for column in rawMarketCap.columns: # 종가, 시가총액, 거래량, 시가총액, 상장주식수
                 tmpDict[column] = str(rawMarketCap.loc[ticker][column]).replace(" ", "")
-
-            resMarketCap[종목명] = tmpDict
+            resMarketCap[corpName] = tmpDict
 
         # NOTE: 데이터 백업.
         with open(filePath, 'wb') as f:
@@ -181,7 +180,6 @@ class Krx:
         # tickerList = stock.get_market_ticker_list(date, market="ALL")
         # for ticker in tqdm(tickerList, desc):
         #     corpName = stock.get_market_ticker_name(ticker)
-            # print(corpName)
             try:
                 mergedDict[corpName] = marketOhlcv[corpName]
                 mergedDict[corpName]["종목명"] = corpName
@@ -191,7 +189,6 @@ class Krx:
                 pass
 
         resData["data"] = mergedDict
-
         resData["finish"] = True
 
         # NOTE: 백업 데이터 존재 여부 확인.

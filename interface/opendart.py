@@ -2,7 +2,7 @@
 import datetime
 
 import requests
-from ast import literal_eval # parse, string to dictionray
+from ast import literal_eval  # parse, string to dictionray
 
 from interface.crtfc_key import CRTFC_KEY
 from interface.corpcode import CorpCode
@@ -11,9 +11,10 @@ import json
 
 import os
 
-import pickle # key-value 유형의 데이터는 흔히 Dictionary 자료형 저장하는데 유용.
+import pickle  # key-value 유형의 데이터는 흔히 Dictionary 자료형 저장하는데 유용.
 
 from tqdm import tqdm
+
 
 class OpenDart:
     __statusCode = {
@@ -36,7 +37,8 @@ class OpenDart:
     API_HOST = "https://opendart.fss.or.kr/api/"
     __SUCCESS = 200
 
-    __dirFinancialInfo = os.path.dirname(os.path.abspath(__file__)) + '/data/financialinfo'
+    __dirFinancialInfo = os.path.dirname(
+        os.path.abspath(__file__)) + '/data/financialinfo'
 
     def __init__(self):
         self.corpCode = CorpCode()
@@ -55,7 +57,9 @@ class OpenDart:
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.__dirFinancialInfo):
             os.makedirs(self.__dirFinancialInfo)
-        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        filePath = self.__dirFinancialInfo + '/' + \
+            self.__getFinancialInfoBinaryFileName(
+                businessYear, businessQuarter)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
@@ -66,7 +70,8 @@ class OpenDart:
         reportCode = self.__QUARTER[int(businessQuarter)]
 
         # NOTE: 단일회사 주요계정, 다중회사 주요계정?
-        URI = self.API_HOST  + "fnlttSinglAcnt.json" + "?crtfc_key=" + str(CRTFC_KEY) + "&corp_code=" + str(corpCode) + "&bsns_year=" + str(businessYear) + "&reprt_code=" + str(reportCode)
+        URI = self.API_HOST + "fnlttSinglAcnt.json" + "?crtfc_key=" + str(CRTFC_KEY) + "&corp_code=" + str(
+            corpCode) + "&bsns_year=" + str(businessYear) + "&reprt_code=" + str(reportCode)
         res = requests.get(URI)
 
         if res.status_code != self.__SUCCESS:
@@ -74,11 +79,13 @@ class OpenDart:
             return None
 
         resDecode = res.content.decode("utf-8")
-        resRawDictionary = literal_eval(resDecode) # parse, string to dictionray
+        # parse, string to dictionray
+        resRawDictionary = literal_eval(resDecode)
 
         # print(resRawDictionary)
         if resRawDictionary["status"] != "000":
-            print("[warn] 종목명:",corpName, ", status:", resRawDictionary["status"], self.__statusCode[resRawDictionary["status"]])
+            print("[warn] 종목명:", corpName, ", status:", resRawDictionary["status"],
+                  self.__statusCode[resRawDictionary["status"]])
             return None
 
         resDictionary = self.__dataCleansing(resRawDictionary["list"])
@@ -87,7 +94,7 @@ class OpenDart:
         tmpDict = dict()
         tmpDict[corpName] = resDictionary
 
-        # NOTE: [데이터 백업] 파일 있을 경우. 
+        # NOTE: [데이터 백업] 파일 있을 경우.
         financialInfoDictionary = None
         if os.path.isfile(filePath):
             with open(filePath, 'rb') as f:
@@ -106,7 +113,9 @@ class OpenDart:
         if self.__checkParameterType(businessYear, businessQuarter) == False:
             return None
 
-        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        filePath = self.__dirFinancialInfo + '/' + \
+            self.__getFinancialInfoBinaryFileName(
+                businessYear, businessQuarter)
         if self.__checkFinishMark(businessYear, businessQuarter):
             if os.path.isfile(filePath) == False:
                 print("fatal error")
@@ -118,14 +127,15 @@ class OpenDart:
         self.__clearExtractFinishMark(businessYear, businessQuarter)
 
         corpList = self.corpCode.getAllCorpCode()
-        desc="Collecting financial statments ..."
+        desc = "Collecting financial statments ..."
         for corp in tqdm(corpList, desc):
             corpName = corp.findtext("corp_name")
             # corpCode = corpList[i].findtext("corp_code")
             stockCode = corp.findtext("stock_code")
             if stockCode == '' or stockCode == ' ':
                 continue
-            self.getFinancialInformation(corpName, businessYear, businessQuarter)
+            self.getFinancialInformation(
+                corpName, businessYear, businessQuarter)
 
         self.__setExtractFinishMark(businessYear, businessQuarter)
 
@@ -137,7 +147,9 @@ class OpenDart:
         return None
 
     def __setExtractFinishMark(self, businessYear, businessQuarter):
-        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        filePath = self.__dirFinancialInfo + '/' + \
+            self.__getFinancialInfoBinaryFileName(
+                businessYear, businessQuarter)
 
         financialInfoDictionary = None
         if os.path.isfile(filePath):
@@ -148,7 +160,9 @@ class OpenDart:
                 pickle.dump(financialInfoDictionary, f)
 
     def __clearExtractFinishMark(self, businessYear, businessQuarter):
-        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        filePath = self.__dirFinancialInfo + '/' + \
+            self.__getFinancialInfoBinaryFileName(
+                businessYear, businessQuarter)
 
         if os.path.isfile(filePath):
             with open(filePath, 'rb') as f:
@@ -165,7 +179,9 @@ class OpenDart:
         if not os.path.isdir(self.__dirFinancialInfo):
             return False
         # print(path)
-        filePath = self.__dirFinancialInfo + '/' + self.__getFinancialInfoBinaryFileName(businessYear, businessQuarter)
+        filePath = self.__dirFinancialInfo + '/' + \
+            self.__getFinancialInfoBinaryFileName(
+                businessYear, businessQuarter)
         # print(filePath)
         if os.path.isfile(filePath) == False:
             return False
@@ -189,20 +205,21 @@ class OpenDart:
 
     def __dataCleansing(self, rawDictionary):
         resDictionary = dict()
-        resDictionary["rcept_no"]   = str(rawDictionary[0]["rcept_no"])
+        resDictionary["rcept_no"] = str(rawDictionary[0]["rcept_no"])
         resDictionary["reprt_code"] = str(rawDictionary[0]["reprt_code"])
-        resDictionary["corp_code"]  = str(rawDictionary[0]["corp_code"])
+        resDictionary["corp_code"] = str(rawDictionary[0]["corp_code"])
         resDictionary["stock_code"] = str(rawDictionary[0]["stock_code"])
-        resDictionary["fs_div"]     = str(rawDictionary[0]["fs_div"])
-        resDictionary["fs_nm"]      = str(rawDictionary[0]["fs_nm"])
-        resDictionary["sj_div"]     = str(rawDictionary[0]["sj_div"])
-        resDictionary["thstrm_nm"]  = str(rawDictionary[0]["thstrm_nm"])
-        resDictionary["thstrm_dt"]  = str(rawDictionary[0]["thstrm_dt"])
-        resDictionary["sj_div"]     = str(rawDictionary[0]["sj_div"])
+        resDictionary["fs_div"] = str(rawDictionary[0]["fs_div"])
+        resDictionary["fs_nm"] = str(rawDictionary[0]["fs_nm"])
+        resDictionary["sj_div"] = str(rawDictionary[0]["sj_div"])
+        resDictionary["thstrm_nm"] = str(rawDictionary[0]["thstrm_nm"])
+        resDictionary["thstrm_dt"] = str(rawDictionary[0]["thstrm_dt"])
+        resDictionary["sj_div"] = str(rawDictionary[0]["sj_div"])
 
         # [NOTE] frmtrm_dt, frmtrm_amount 은 저장하지 않았습니다.
         for rawDic in rawDictionary:
-            resDictionary[rawDic["account_nm"]] = str(rawDic["thstrm_amount"].replace(",", ""))
+            resDictionary[rawDic["account_nm"]] = str(
+                rawDic["thstrm_amount"].replace(",", ""))
 
         # return json.dumps(resDictionary, ensure_ascii=False, indent="\t") # dict to json
         return resDictionary

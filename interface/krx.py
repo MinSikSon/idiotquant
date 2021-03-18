@@ -16,11 +16,16 @@ from interface.corpcode import CorpCode
 
 from tqdm import tqdm
 
+
 class Krx:
-    dirMarketFundamental = os.path.dirname(os.path.abspath(__file__)) + '/data/marketfundamental'
-    dirMarketOhlcv = os.path.dirname(os.path.abspath(__file__)) + '/data/marketohlcv'
+    dirMarketFundamental = os.path.dirname(
+        os.path.abspath(__file__)) + '/data/marketfundamental'
+    dirMarketOhlcv = os.path.dirname(
+        os.path.abspath(__file__)) + '/data/marketohlcv'
     dirMarket = os.path.dirname(os.path.abspath(__file__)) + '/data/market'
-    dirMarketCap = os.path.dirname(os.path.abspath(__file__)) + '/data/marketcap'
+    dirMarketCap = os.path.dirname(
+        os.path.abspath(__file__)) + '/data/marketcap'
+
     def __init__(self):
         pass
 
@@ -31,7 +36,8 @@ class Krx:
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.dirMarketOhlcv):
             os.makedirs(self.dirMarketOhlcv)
-        filePath = self.dirMarketOhlcv + '/marketOhlcv_%s_%s.bin' % (market, date)
+        filePath = self.dirMarketOhlcv + \
+            '/marketOhlcv_%s_%s.bin' % (market, date)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
@@ -43,7 +49,8 @@ class Krx:
             rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
         except:
             print("[param] date 를 확인해주세요.")
-            print("[위 사항이 아니라면] [KRX API update 가 필요합니다] stock.get_market_ohlcv_by_ticker")
+            print(
+                "[위 사항이 아니라면] [KRX API update 가 필요합니다] stock.get_market_ohlcv_by_ticker")
             exit()
 
         # NOTE: rawOhlcvList 데이터는 pandas.DataFrame 인데, DaraFrame 전체가 empty 면 rawOhlcvList.empty 는 True 를 리턴 함.
@@ -52,13 +59,13 @@ class Krx:
             return None
 
         resOhlcv = dict()
-        desc="get ohlcv"
+        desc = "get ohlcv"
         for ticker in tqdm(rawOhlcvList.index, desc):
             corpName = stock.get_market_ticker_name(ticker)
             tmpDict = dict()
             for column in rawOhlcvList.columns:
                 tmpDict[column] = str(rawOhlcvList.loc[ticker][column])
-            resOhlcv[corpName]= tmpDict
+            resOhlcv[corpName] = tmpDict
 
         # NOTE: 데이터 백업.
         with open(filePath, 'wb') as f:
@@ -73,7 +80,8 @@ class Krx:
         # NOTE: 백업 데이터 존재 여부 확인.
         if not os.path.isdir(self.dirMarketFundamental):
             os.makedirs(self.dirMarketFundamental)
-        filePath = self.dirMarketFundamental + '/marketFundamental_%s_%s.bin' % (market, date)
+        filePath = self.dirMarketFundamental + \
+            '/marketFundamental_%s_%s.bin' % (market, date)
         if os.path.isfile(filePath):
             # NOTE: file 이 있고, corpName 에 해당하는 데이터 있는지 확인.
             with open(filePath, 'rb') as f:
@@ -82,7 +90,8 @@ class Krx:
 
         rawFundamentalList = None
         try:
-            rawFundamentalList = stock.get_market_fundamental_by_ticker(date, market) # pandas form
+            rawFundamentalList = stock.get_market_fundamental_by_ticker(
+                date, market)  # pandas form
         except:
             print("[KRX API update 가 필요합니다] stock.get_market_fundamental_by_ticker")
             exit()
@@ -92,12 +101,13 @@ class Krx:
             return None
 
         resFundamental = dict()
-        desc="get fundamental"
+        desc = "get fundamental"
         for ticker in tqdm(rawFundamentalList.index, desc):
             corpName = stock.get_market_ticker_name(ticker)
             tmpDict = dict()
             for column in rawFundamentalList.columns:
-                tmpDict[column] = str(rawFundamentalList.loc[ticker][column]).replace(" ", "")
+                tmpDict[column] = str(
+                    rawFundamentalList.loc[ticker][column]).replace(" ", "")
             resFundamental[corpName] = tmpDict
 
         # NOTE: 데이터 백업.
@@ -111,7 +121,8 @@ class Krx:
             return None
         if not os.path.isdir(self.dirMarketCap):
             os.makedirs(self.dirMarketCap)
-        filePath = self.dirMarketCap + '/' + 'marketCap_%s_%s.bin' % (market, date)
+        filePath = self.dirMarketCap + '/' + \
+            'marketCap_%s_%s.bin' % (market, date)
         if os.path.isfile(filePath):
             with open(filePath, 'rb') as f:
                 marketCap = pickle.load(f)
@@ -119,7 +130,8 @@ class Krx:
 
         rawMarketCap = None
         try:
-            rawMarketCap = stock.get_market_cap_by_ticker(date, market) # pandas form
+            rawMarketCap = stock.get_market_cap_by_ticker(
+                date, market)  # pandas form
         except:
             print("[KRX API update 가 필요합니다] stock.get_market_cap_by_ticker")
             exit()
@@ -129,13 +141,14 @@ class Krx:
             return None
 
         resMarketCap = dict()
-        desc="get marketCap"
+        desc = "get marketCap"
         for ticker in tqdm(rawMarketCap.index, desc):
             tmpDict = dict()
             corpName = stock.get_market_ticker_name(ticker)
             tmpDict["종목명"] = corpName
-            for column in rawMarketCap.columns: # 종가, 시가총액, 거래량, 시가총액, 상장주식수
-                tmpDict[column] = str(rawMarketCap.loc[ticker][column]).replace(" ", "")
+            for column in rawMarketCap.columns:  # 종가, 시가총액, 거래량, 시가총액, 상장주식수
+                tmpDict[column] = str(
+                    rawMarketCap.loc[ticker][column]).replace(" ", "")
             resMarketCap[corpName] = tmpDict
 
         # NOTE: 데이터 백업.
@@ -168,11 +181,12 @@ class Krx:
         if marketCap is None:
             return None
 
-        resData = {"date": date, "finish": False, "market": market, "data_info": {"ohlcv": True, "fundamental": True, "marketCap": True}}
+        resData = {"date": date, "finish": False, "market": market, "data_info": {
+            "ohlcv": True, "fundamental": True, "marketCap": True}}
 
         mergedDict = dict()
-        
-        desc="Today's stock price information ..."
+
+        desc = "Today's stock price information ..."
         corpCode = CorpCode()
         corpList = corpCode.getAllCorpCode()
         for corp in tqdm(corpList, desc):

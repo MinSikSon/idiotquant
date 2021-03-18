@@ -2,6 +2,7 @@ from xml.etree.ElementTree import parse
 
 from pykrx import stock
 
+
 class CorpCode:
     def __init__(self, useCorpCodeXml=True):
         self.useCorpCodeXml = useCorpCodeXml
@@ -30,6 +31,7 @@ class CorpCode:
                     return ticker
 
         return None
+
 
 if __name__ == "__main__":
     corpCode = CorpCode(useCorpCodeXml=False)

@@ -38,5 +38,8 @@ def main(strategyNumber=0):
 
         with open('result/result.json', 'w') as fp:
             # pickle.dump(len(data), fp)
+            dic = []
             for stock in iq.stockList:
-                json.dump(stock.__dict__, fp, ensure_ascii=False, indent=4)
+                dic.append(stock.__dict__['json'])
+                # print(stock.__dict__['json'])
+            json.dump(dic, fp, ensure_ascii=False, indent=4)

@@ -150,3 +150,9 @@ class Stock:
             return float(self.json['EPS'])
         except KeyError:
             return float(0)
+
+    def getOperatingIncome(self):
+        try:
+            return float(self.json['영업이익'])
+        except KeyError:
+            return float(0)

@@ -32,6 +32,7 @@ def main(strategyNumber=0):
                   "| 매출액:", format(int(stock.getFundamentalRevenue()), ','),
                   "| 당기순이익:", format(
                       int(stock.getFundamentalNetProfit()), ','),
+                  "| 영업이익:", format(int(stock.getOperatingIncome()), ','),
                   "| 거래량:", format(int(stock.getTradingVolume()), ',')
                   )
         print(len(iq.stockList))

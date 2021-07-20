@@ -44,11 +44,13 @@ class Krx:
                 marketOhlcv = pickle.load(f)
                 return marketOhlcv
 
+        print('[getMarketOhlcvByTicker] request new')
         rawOhlcvList = None
         try:
             rawOhlcvList = stock.get_market_ohlcv_by_ticker(date, market)
         except:
-            print("[param] date 를 확인해주세요.")
+            print("[param] date 를 확인해주세요.", date, market)
+            print("[위 사항이 아니라면] http://www.krx.co.kr/ 시스템 점검 중 일 수 있습니다.")
             print(
                 "[위 사항이 아니라면] [KRX API update 가 필요합니다] stock.get_market_ohlcv_by_ticker")
             exit()

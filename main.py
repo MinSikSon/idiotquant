@@ -82,6 +82,7 @@ def extractFinancialInformationAllOnly(businessYear, businessQuarter):
 
 
 def extractMarketInformationAllOnly(date):
+    print('extractMarketInformationAllOnly')
     # businessYear = 2020
     # businessQuarter = 3
     marketValue = Krx().getMarketValue(date)
@@ -114,6 +115,9 @@ def getBusinessDay():
 
 
 if __name__ == "__main__":
+    # example
+    ## python3 main.py -f 1 -y 2022 -q 1
+
     # option
     parser = argparse.ArgumentParser(
         description="전략별 종목 추천기능", usage="python3 main.py -h")
